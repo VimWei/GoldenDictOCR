@@ -14,8 +14,5 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
 DetectHiddenWindows, on     ; 可检测到隐藏窗口
 SetTitleMatchMode, 2        ; 窗口标题的某个位置包含 WinTitle 即可匹配
 
-Global GoldenDictFileName := "d:\PortableApps\PortableApps\GoldenDict\GoldenDict.exe"
-Global Capture2TextFileName := "c:\Apps\Capture2Text\Capture2Text.exe"
-
 #Include %A_ScriptDir%\IncludeAHK\PublicIncludes.ahk
 #Include %A_ScriptDir%\IncludeAHK\GoldenDict.ahk

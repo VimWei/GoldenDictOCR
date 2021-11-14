@@ -12,6 +12,8 @@ SetWorkingDir %A_ScriptDir%
 SetBatchLines -1
 CoordMode, ToolTip, Screen
 
+Global GoldenDictFileName := "d:\PortableApps\PortableApps\GoldenDict\GoldenDict.exe"
+Global Capture2TextFileName := "c:\Apps\Capture2Text\Capture2Text.exe"
 Global CaptureMode := "NoCapture"  ; CaptureMode: "NoCapture", "SingleWordCapture", "BoxCapture"
 Global CaptureCount := 0
 Global LineCaptured := ""

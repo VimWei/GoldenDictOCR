@@ -18,9 +18,12 @@ by Vim 2021-11-14 星期日 19:09:30
 
 ## 使用方法
 
-1. 双击打开GoldenDictOCR.ahk，随时准备响应（可以将GoldenDictOCR.ahk加入开机启动）
-2. Ctrl + Alt + O：开启或关闭 OCR 取词 （开启之后，ctrl + 右键——点选取词；ctrl + `——框选取词 ）
-3. Ctrl + Alt + I：开启或关闭鼠标选取取词（开启之后，鼠标选择或双击文字取词）
+1. 双击打开GoldenDictOCR.ahk，随时准备响应（可以将其加入开机启动）
+2. Ctrl + Alt + O：开启或关闭 OCR 取词
+    * 开启之后，点选取词：ctrl + 右键
+    * 开启之后，框选取词：ctrl + `
+3. Ctrl + Alt + I：开启或关闭鼠标选取取词
+    * 开启之后，鼠标选择或双击文字取词
 
 ## 查词大比拼
 
@@ -29,6 +32,10 @@ by Vim 2021-11-14 星期日 19:09:30
 这个案例页面，文字有大有小、有图片有文字，通常工具查询有难度
 
 但在这里so easy!
+
+## 论坛讨论
+
+* https://forum.freemdict.com/t/topic/9311
 
 ## Acknowledge
 
