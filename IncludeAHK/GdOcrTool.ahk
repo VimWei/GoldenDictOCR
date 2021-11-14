@@ -29,7 +29,7 @@ Main() {
     Menu, Tray, Icon, shell32.dll, 172
     OnClipboardChange("ClipboardChange")
 ;    Run % GoldenDictFileName
-    Run % Capture2TextFileName
+    Run %Capture2TextFileName%
 ;    Run % A_ScriptDir . "\Capture2Text.exe"
     Return
 }

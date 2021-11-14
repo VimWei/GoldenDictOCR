@@ -14,7 +14,7 @@ by Vim 2021-11-14 星期日 19:09:30
 
 1. 安装 GoldenDict、Capture2Text、AutoHotkey到任意位置
 2. 解压GoldenDictOCR到任意位置
-3. 在GoldenDictOCR.ahk中配置好GoldenDict和Capture2Text的安装地址
+3. 在GdOcrTool.ahk中配置好GoldenDict和Capture2Text的安装地址
 
 ## 使用方法
 
