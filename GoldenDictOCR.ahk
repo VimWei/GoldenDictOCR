@@ -14,5 +14,7 @@ SetWorkingDir %A_ScriptDir% ; Ensures a consistent starting directory
 DetectHiddenWindows, on     ; 可检测到隐藏窗口
 SetTitleMatchMode, 2        ; 窗口标题的某个位置包含 WinTitle 即可匹配
 
+Menu, Tray, Icon, IncludeAHK\GO.ico
+
 #Include %A_ScriptDir%\IncludeAHK\PublicIncludes.ahk
 #Include %A_ScriptDir%\IncludeAHK\GoldenDict.ahk

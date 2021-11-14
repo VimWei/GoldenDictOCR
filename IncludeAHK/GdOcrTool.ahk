@@ -11,6 +11,7 @@ SendMode Input
 SetWorkingDir %A_ScriptDir%
 SetBatchLines -1
 CoordMode, ToolTip, Screen
+DetectHiddenWindows, On
 
 Global GoldenDictFileName := "d:\PortableApps\PortableApps\GoldenDict\GoldenDict.exe"
 Global Capture2TextFileName := "c:\Apps\Capture2Text\Capture2Text.exe"
@@ -18,7 +19,8 @@ Global CaptureMode := "NoCapture"  ; CaptureMode: "NoCapture", "SingleWordCaptur
 Global CaptureCount := 0
 Global LineCaptured := ""
 Global ForwardLineCaptured := ""
-Global TimeOut := 6000
+Global Timeout := 8000  ; Timeout in millisecond. Abort capture if the timeout has expired.
+Global StartTime, EndTime
 
 Main()
 
@@ -27,10 +29,18 @@ Main()
 
 Main() {
     Menu, Tray, Icon, shell32.dll, 172
+
+    If !FileExist(GoldenDictFileName) {
+        MsgBox, 48, Warning, GoldenDict.exe not found! Exiting program...
+        ExitApp
+    }
+    If !FileExist(Capture2TextFileName) {
+        MsgBox, 48, Warning, Capture2Text.exe not found! Exiting program...
+        ExitApp
+    }
+
+    Run % Capture2TextFileName
     OnClipboardChange("ClipboardChange")
-;    Run % GoldenDictFileName
-    Run %Capture2TextFileName%
-;    Run % A_ScriptDir . "\Capture2Text.exe"
     Return
 }
 
@@ -117,6 +127,18 @@ SendToGD(SearchTerm) {
 ResetCaptureMode() {
     CaptureMode := "NoCapture"
     CaptureCount := 0
+    SetTimer, CaptureTimeout, Off
+    Return
+}
+
+CaptureTimeout() {
+    EndTime := A_TickCount
+    ElapsedTime := EndTime - StartTime
+    If (ElapsedTime > Timeout) {
+        ResetCaptureMode()
+        ToolTip, Timeout has expired. Aborting capture.
+        SetTimer, TurnOffToolTip, -1000
+    }
     Return
 }
 
@@ -129,43 +151,60 @@ TurnOffToolTip() {
 
 ^RButton::  ; Capture a single word by pressing ctrl + right click.
 SingleWordCapture() {
+    If !WinExist("ahk_exe Capture2Text.exe") {
+        MsgBox, 48, Warning, Capture2Text is not running! Aborting single word capture.
+        Return
+    }
+    StartTime := A_TickCount
     CaptureMode := "SingleWordCapture"
     CaptureCount := 0
     StartLineCapture()
+    SetTimer, CaptureTimeout, 1000
     Return
 }
 
 ^`::  ; Start box capture by pressing ctrl + `
 BoxCapture() {
+    If !WinExist("ahk_exe Capture2Text.exe") {
+        MsgBox, 48, Warning, Capture2Text is not running! Aborting box capture...
+        Return
+    }
+    StartTime := A_TickCount
     CaptureMode := "BoxCapture"
     ToolTip, Hold down left mouse button to start box capture.
     SetTimer, TurnOffToolTip, -1000
+    SetTimer, CaptureTimeout, 1000
     Return
 }
 
+; Creates context-sensitive hotkeys.
+#If (CaptureMode == "BoxCapture")
+
 LButton::
 LeftButtonDown() {
-    If (CaptureMode != "BoxCapture") {
-        Send, {LButton Down}
-    } Else {
-        TurnOffToolTip()
-        StartBoxCapture()
-    }
+    TurnOffToolTip()
+    StartBoxCapture()
     Return
 }
 
 LButton Up::
 LeftButtonUp() {
-    If (CaptureMode != "BoxCapture") {
-        Send, {LButton Up}
-    } Else {
-        Send, {LButton Down}
-    }
+    Send, {LButton Down}
     Return
 }
 
+Esc::
+ForceAbortBoxCapture() {
+    ToolTip, Aborting box capture.
+    SetTimer, TurnOffToolTip, -1000
+    ResetCaptureMode()
+    Return
+}
+
+#If
+
 ;=======================================================================================
-; Hotkeys defined in Capture2Text.
+; Call Capture2Text by sending hotkeys. Hotkeys are defined in Capture2Text.
 
 StartLineCapture() {
     Send, ^+#e  ; crtl + shift + win + e
