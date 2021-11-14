@@ -1,6 +1,8 @@
 # GoldenDictOCR
 by Vim 2021-11-14 星期日 19:09:30
 
+![demo](demo.gif)
+
 ## 特点
 
 * 既可以使用OCR进行查词（适合于图片等难以选中文字的情形）
@@ -26,7 +28,7 @@ by Vim 2021-11-14 星期日 19:09:30
 * https://www.apple.com/shop/gifts
 这个案例页面，文字有大有小、有图片有文字，通常工具查询有难度
 
-但在这里so easy，详见 ![demo](demo.gif)
+但在这里so easy!
 
 ## Acknowledge
 
