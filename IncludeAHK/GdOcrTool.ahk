@@ -2,6 +2,7 @@
 ; GdOcrTool.ahk is an AutoHotkey (v1.1) script to enhance the GoldenDict with OCR
 ; functionality using Capture2Text.
 ; Written by Johnny Van, 2021/11/13
+; Updated 2021/11/14, add support for MDict, Eudic
 ;=======================================================================================
 ; Auto-execution section.
 
@@ -14,8 +15,11 @@ CoordMode, ToolTip, Screen
 DetectHiddenWindows, On
 
 Global GoldenDictFileName := "d:\PortableApps\PortableApps\GoldenDict\GoldenDict.exe"
+Global MdictFileName := "C:\Program Files\MDictPC\MDict.exe"
+Global EudicFileName := "C:\Program Files (x86)\eudic\eudic.exe"
 Global Capture2TextFileName := "c:\Apps\Capture2Text\Capture2Text.exe"
-Global CaptureMode := "NoCapture"  ; CaptureMode: "NoCapture", "SingleWordCapture", "BoxCapture"
+Global DictSelected := "GoldenDict"  ; Dictionary selected: "GoldenDict", "MDict", "Eudic"
+Global CaptureMode := "NoCapture"  ; Capture mode: "NoCapture", "SingleWordCapture", "BoxCapture"
 Global CaptureCount := 0
 Global LineCaptured := ""
 Global ForwardLineCaptured := ""
@@ -30,13 +34,33 @@ Main()
 Main() {
     Menu, Tray, Icon, shell32.dll, 172
 
-    If !FileExist(GoldenDictFileName) {
-        MsgBox, 48, Warning, GoldenDict.exe not found! Exiting program...
-        ExitApp
-    }
     If !FileExist(Capture2TextFileName) {
         MsgBox, 48, Warning, Capture2Text.exe not found! Exiting program...
         ExitApp
+    }
+
+    Switch DictSelected {
+        Case "GoldenDict":
+            If !FileExist(GoldenDictFileName) {
+                MsgBox, 48, Warning, GoldenDict.exe not found! Exiting program...
+                ExitApp
+            } Else {
+;                Run % GoldenDictFileName
+            }
+        Case "MDict":
+            If !FileExist(MDictFileName) {
+                MsgBox, 48, Warning, MDict.exe not found! Exiting program...
+                ExitApp
+            } Else {
+                Run % MDictFileName
+            }
+        Case "Eudic":
+            If !FileExist(EudicFileName) {
+                MsgBox, 48, Warning, eudic.exe not found! Exiting program...
+                ExitApp
+            } Else {
+                Run % EudicFileName
+            }
     }
 
     Run % Capture2TextFileName
@@ -80,7 +104,7 @@ SingleWordCaptureHandler() {
             SearchTerm := ArrayTemp[1]
             ExtractError := ArrayTemp[2]
             If !ExtractError {
-                SendToGD(SearchTerm)
+                SendToSelectedDict(SearchTerm)
             }
         Default:
             ResetCaptureMode()
@@ -90,7 +114,7 @@ SingleWordCaptureHandler() {
 
 BoxCaptureHandler() {
     ResetCaptureMode()
-    SendToGD(Clipboard)
+    SendToSelectedDict(Clipboard)
     Return
 }
 
@@ -117,10 +141,48 @@ ExtractSingleWord() {
     Return [SearchTerm, ExtractError]
 }
 
+SendToSelectedDict(SearchTerm) {
+    Switch DictSelected {
+        Case "GoldenDict":
+            SendToGoldenDict(SearchTerm)
+        Case "MDict":
+            SendToMDict(SearchTerm)
+        Case "Eudic":
+            SendToEudic(SearchTerm)
+    }
+    Return
+}
+
 ; Send the captured text to GoldenDict.
-SendToGD(SearchTerm) {
+SendToGoldenDict(SearchTerm) {
     SearchTermCli := """" . StrReplace(SearchTerm, """", """""") . """"
     Run, %GoldenDictFileName% %SearchTermCli%
+    Return
+}
+
+; Send the captured text to MDict.
+SendToMDict(SearchTerm) {
+    Clipboard := SearchTerm
+    Run, %MdictFileName%
+    WinWait, ahk_pid MDict.exe, , 0.2
+    If WinActive("ahk_exe MDict.exe") {
+        Send, ^v
+        Sleep, 50
+        Send, {Enter}
+    }
+    Return
+}
+
+; Send the captured text to Eudic.
+SendToEudic(SearchTerm) {
+    Clipboard := SearchTerm
+    Run, %EudicFileName%
+    WinWait, ahk_pid eudic.exe, , 0.2
+    If WinActive("ahk_exe eudic.exe") {
+        Send, ^v
+        Sleep, 50
+        Send, {Enter}
+    }
     Return
 }
 
