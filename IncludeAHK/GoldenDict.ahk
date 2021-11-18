@@ -7,12 +7,14 @@
 ^!o::
 	GV_ToggleOCRTakeWord := !GV_ToggleOCRTakeWord
 	if (GV_ToggleOCRTakeWord == 1) {
-        fun_SwitchTips("启用OCR取词", "Center", "Center", 800)
         Run %A_ScriptDir%\IncludeAHK\GdOcrTool.ahk
         if (GV_ToggleMouseTakeWord == 1) {
-            fun_SwitchTips("关闭鼠标取词", "Center", "Center", 800)
+            fun_SwitchTips("启用OCR取词，并关闭鼠标取词", "Center", "Center", 1000)
             GV_ToggleMouseTakeWord := 0
         }
+		else {
+			fun_SwitchTips("启用OCR取词", "Center", "Center", 800)
+		}
     }
 	else {
         fun_SwitchTips("关闭OCR取词", "Center", "Center", 800)
@@ -35,13 +37,15 @@ return
 ^!i::
 	GV_ToggleMouseTakeWord := !GV_ToggleMouseTakeWord
 	if (GV_ToggleMouseTakeWord == 1) {
-        fun_SwitchTips("启用鼠标取词", "Center", "Center", 800)
         if (GV_ToggleOCRTakeWord == 1) {
-            fun_SwitchTips("关闭OCR取词", "Center", "Center", 800)
+            fun_SwitchTips("启用鼠标取词，并关闭OCR取词", "Center", "Center", 1000)
             GV_ToggleOCRTakeWord := 0
             closeScript("GdOcrTool.ahk")
             closeApps("Capture2Text.exe")
         }
+		else {
+			fun_SwitchTips("启用鼠标取词", "Center", "Center", 800)
+		}
     }
 	else {
         fun_SwitchTips("关闭鼠标取词", "Center", "Center", 800)
