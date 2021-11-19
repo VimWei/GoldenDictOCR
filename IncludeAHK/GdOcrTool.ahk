@@ -2,7 +2,8 @@
 ; GdOcrTool.ahk is an AutoHotkey (v1.1) script to enhance the GoldenDict with OCR
 ; functionality using Capture2Text.
 ; Written by Johnny Van, 2021/11/13
-; Updated 2021/11/14, add support for MDict, Eudic
+; Updated 2021/11/14, add support for MDict, Eudic.
+; Updated 2021/11/19, add visual feedback for single word capture.
 ;=======================================================================================
 ; Auto-execution section.
 
@@ -37,6 +38,8 @@ Main() {
     If !FileExist(Capture2TextFileName) {
         MsgBox, 48, Warning, Capture2Text.exe not found! Exiting program...
         ExitApp
+    } Else {
+        Run % Capture2TextFileName
     }
 
     Switch DictSelected {
@@ -44,26 +47,25 @@ Main() {
             If !FileExist(GoldenDictFileName) {
                 MsgBox, 48, Warning, GoldenDict.exe not found! Exiting program...
                 ExitApp
-            } Else {
-;                Run % GoldenDictFileName
+            } Else If !WinExist("ahk_exe GoldenDict.exe") {
+                Run % GoldenDictFileName
             }
         Case "MDict":
             If !FileExist(MDictFileName) {
                 MsgBox, 48, Warning, MDict.exe not found! Exiting program...
                 ExitApp
-            } Else {
+            } Else If !WinExist("ahk_exe MDict.exe") {
                 Run % MDictFileName
             }
         Case "Eudic":
             If !FileExist(EudicFileName) {
                 MsgBox, 48, Warning, eudic.exe not found! Exiting program...
                 ExitApp
-            } Else {
+            } Else If !WinExist("ahk_exe eudic.exe") {
                 Run % EudicFileName
             }
     }
 
-    Run % Capture2TextFileName
     OnClipboardChange("ClipboardChange")
     Return
 }
@@ -105,6 +107,8 @@ SingleWordCaptureHandler() {
             ExtractError := ArrayTemp[2]
             If !ExtractError {
                 SendToSelectedDict(SearchTerm)
+                ToolTip % SearchTerm
+                SetTimer, TurnOffToolTip, -1000
             }
         Default:
             ResetCaptureMode()
@@ -164,7 +168,7 @@ SendToGoldenDict(SearchTerm) {
 SendToMDict(SearchTerm) {
     Clipboard := SearchTerm
     Run, %MdictFileName%
-    WinWait, ahk_pid MDict.exe, , 0.2
+    WinWait, ahk_exe MDict.exe, , 0.2
     If WinActive("ahk_exe MDict.exe") {
         Send, ^v
         Sleep, 50
@@ -177,7 +181,7 @@ SendToMDict(SearchTerm) {
 SendToEudic(SearchTerm) {
     Clipboard := SearchTerm
     Run, %EudicFileName%
-    WinWait, ahk_pid eudic.exe, , 0.2
+    WinWait, ahk_exe eudic.exe, , 0.2
     If WinActive("ahk_exe eudic.exe") {
         Send, ^v
         Sleep, 50
@@ -215,6 +219,7 @@ TurnOffToolTip() {
 SingleWordCapture() {
     If !WinExist("ahk_exe Capture2Text.exe") {
         MsgBox, 48, Warning, Capture2Text is not running! Aborting single word capture.
+        Run % Capture2TextFileName
         Return
     }
     StartTime := A_TickCount
@@ -229,13 +234,12 @@ SingleWordCapture() {
 BoxCapture() {
     If !WinExist("ahk_exe Capture2Text.exe") {
         MsgBox, 48, Warning, Capture2Text is not running! Aborting box capture...
+        Run % Capture2TextFileName
         Return
     }
-    StartTime := A_TickCount
     CaptureMode := "BoxCapture"
     ToolTip, Hold down left mouse button to start box capture.
     SetTimer, TurnOffToolTip, -1000
-    SetTimer, CaptureTimeout, 1000
     Return
 }
 
@@ -252,6 +256,8 @@ LeftButtonDown() {
 LButton Up::
 LeftButtonUp() {
     Send, {LButton Down}
+    StartTime := A_TickCount  ; Start count down after box is drawn.
+    SetTimer, CaptureTimeout, 1000
     Return
 }
 
