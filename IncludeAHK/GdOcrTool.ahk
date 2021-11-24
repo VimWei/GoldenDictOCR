@@ -30,11 +30,11 @@ Global StartTime, EndTime
 Main()
 
 ;=======================================================================================
-;
+; 
 
 Main() {
     Menu, Tray, Icon, shell32.dll, 172
-
+    
     If !FileExist(Capture2TextFileName) {
         MsgBox, 48, Warning, Capture2Text.exe not found! Exiting program...
         ExitApp
@@ -105,7 +105,7 @@ SingleWordCaptureHandler() {
             ArrayTemp := ExtractSingleWord()
             SearchTerm := ArrayTemp[1]
             ExtractError := ArrayTemp[2]
-            If !ExtractError {
+            If (!ExtractError And (SearchTerm != "")) {
                 SendToSelectedDict(SearchTerm)
                 ToolTip % SearchTerm
                 SetTimer, TurnOffToolTip, -1000
@@ -118,7 +118,10 @@ SingleWordCaptureHandler() {
 
 BoxCaptureHandler() {
     ResetCaptureMode()
-    SendToSelectedDict(Clipboard)
+    SearchTerm := Clipboard
+    If (SearchTerm != "") {
+        SendToSelectedDict(SearchTerm)
+    }
     Return
 }
 
